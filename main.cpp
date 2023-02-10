@@ -52,8 +52,8 @@ class HelloWindow : public Gtk::ApplicationWindow {
     Glib::RefPtr<Gtk::ImageMenuItem> menu_file_quit;
 
     
-    Glib::RefPtr<Gtk::ImageMenuItem> menu_edit_rotate;   
-
+    Glib::RefPtr<Gtk::ImageMenuItem> menu_edit_rotate;
+    Glib::RefPtr<Gtk::ImageMenuItem> menu_edit_resize;
     
     // Rotate dialog
     Glib::RefPtr<Gtk::Dialog> rotate_dialog;
@@ -138,20 +138,30 @@ class HelloWindow : public Gtk::ApplicationWindow {
         return res;
     }
 
+    void on_openfile_dialog();
+    void on_savefile_dialog();
+
 public:
     HelloWindow()
-    : ui{Gtk::Builder::create_from_file("simple_with_dlg.glade")} {
-        if(ui) {
+    : ui{Gtk::Builder::create_from_file("simple_with_dlg.glade")} 
+    {
+        set_title("Simple Gtk::Builder demo");
+        set_default_size(400, 400);
+
+        if(ui) 
+        {
             ui->get_widget<Gtk::Box>("id_cont", cont);
             widgets.push_back(cont);
 
             display_label = getWidgetAndAdd<Gtk::Label>("id_display_label");
             status_label = getWidgetAndAdd<Gtk::Label>("id_status_label"); 
             display_btn = getWidgetAndAdd<Gtk::Button>("id_display_button");
+            
             menu_file_quit = getWidgetAndAdd<Gtk::ImageMenuItem>("id_menu_file_exit");            
             menu_file_load = getWidgetAndAdd<Gtk::ImageMenuItem>("id_menu_file_load");
             menu_file_save = getWidgetAndAdd<Gtk::ImageMenuItem>("id_menu_file_save");            
             menu_edit_rotate = getWidgetAndAdd<Gtk::ImageMenuItem>("id_menu_edit_rotate");
+            menu_edit_resize = getWidgetAndAdd<Gtk::ImageMenuItem>("id_menu_edit_resize");
             
 
             // --------------- Rotate Dialog ---------------------------------
@@ -161,7 +171,13 @@ public:
             rotate_edit = getWidgetAndAdd<Gtk::TextView>("id_rotate_edit");
             //----------------------------------------------------------------
 
-
+            // --------------- Resize Dialog ---------------------------------
+            resize_dialog = getWidgetAndAdd<Gtk::Dialog>("id_resize_dialog");
+            resize_ok_btn = getWidgetAndAdd<Gtk::Button>("id_resize_ok");
+            resize_cancel_btn = getWidgetAndAdd<Gtk::Button>("id_resize_cancel");
+            resize_width_edit = getWidgetAndAdd<Gtk::TextView>("id_resize_width_edit");
+            resize_height_edit = getWidgetAndAdd<Gtk::TextView>("id_resize_height_edit");
+            //----------------------------------------------------------------
 
             if(checkWidgets())
             {
@@ -171,19 +187,44 @@ public:
                 });
                 
                 // For Rotate dialog !!!
+
+                menu_edit_rotate->signal_activate().connect(
+                [this]() {
+                    display_label->set_text("Rotate");
+                    rotate_dialog->set_transient_for(*this);
+                    rotate_dialog->run();
+                });
+
+                menu_edit_resize->signal_activate().connect(
+                [this]() {
+                    display_label->set_text("Resize");
+                    rotate_dialog->set_transient_for(*this);
+                    resize_dialog->run();
+                });
+
+                menu_file_quit->signal_activate().connect(
+                [this]() {
+                    display_label->set_text("Quit");
+                });
+
+                menu_file_load->signal_activate().connect(
+                    sigc::mem_fun(*this, &HelloWindow::on_openfile_dialog));
+                
+                menu_file_save->signal_activate().connect(
+                    sigc::mem_fun(*this, &HelloWindow::on_savefile_dialog));
+
+                    
                 rotate_ok_btn->signal_clicked().connect(
                 [this]() {
-                    std::cout << " Rotate OK" << std::endl;
                     auto content = rotate_edit->get_buffer()->get_text();
                     display_label->set_text(content);
                     // Magick++ rotate
                     rotate_dialog->hide();
                 });
+
                 rotate_edit->get_buffer()->signal_changed().connect(
                 [this]() {
-                    std::cout << " Rotate changed" << std::endl;
                     auto content = rotate_edit->get_buffer()->get_text();
-                    std::cout << content << std::endl;
 
                     boost::regex regExInt("^(\\+|-)?\\d+$");
                     boost::regex regExDouble("^(-?)(0|([1-9][0-9]*))(\\.[0-9]+)?$");
@@ -191,78 +232,105 @@ public:
                     auto status = boost::regex_match(std::string(content), regExDouble);
                     rotate_ok_btn->set_sensitive(status);
                 });
+
                 rotate_cancel_btn->signal_clicked().connect(
                 [this]() {
                     rotate_dialog->hide();
                     std::cout << " Rotate Cancel" << std::endl;
                 });
-                ////////////////////////
 
-                menu_file_quit->signal_activate().connect(
+
+                // For Resize dialog !!!
+                resize_ok_btn->signal_clicked().connect(
                 [this]() {
-                    display_label->set_text("Quit");
+                    auto content_width = resize_width_edit->get_buffer()->get_text();
+                    auto content_height = resize_height_edit->get_buffer()->get_text();
+                    display_label->set_text(content_width + "x" + content_height);
+                    // Magick++ resize(zoom)
+                    resize_dialog->hide();
                 });
-                
-                
-                menu_edit_rotate->signal_activate().connect(
+
+                resize_width_edit->get_buffer()->signal_changed().connect(
                 [this]() {
-                    display_label->set_text("Rotate");
-                    rotate_dialog->set_transient_for(*this);
-                    rotate_dialog->run();
+                    auto content_width = resize_width_edit->get_buffer()->get_text();
+                    auto content_height = resize_height_edit->get_buffer()->get_text();
+
+                    boost::regex regExInt("^(\\+|-)?\\d+$");
+                    
+                    auto status_width = boost::regex_match(std::string(content_width), regExInt);
+                    auto status_height = boost::regex_match(std::string(content_height), regExInt);
+
+                    resize_ok_btn->set_sensitive(status_width & status_height);
                 });
-                              
 
-                menu_file_load->signal_activate().connect(
+                resize_height_edit->get_buffer()->signal_changed().connect(
                 [this]() {
+                    auto content_height = resize_height_edit->get_buffer()->get_text();
+                    auto content_width = resize_width_edit->get_buffer()->get_text();
 
-                    /////////////////////////////////////////////////
-                    Gtk::FileChooserDialog dialog("Please choose a file",
-                            Gtk::FILE_CHOOSER_ACTION_OPEN);
-                    dialog.set_transient_for(*this);
-
-                    //Add response buttons the the dialog:
-                    dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
-                    dialog.add_button("_Open", Gtk::RESPONSE_OK);
-
-                    //Add filters, so that only certain file types can be selected:
-                    auto filter = Gtk::FileFilter::create();
-                    filter->set_name("PNG and JPEG images");
-                    filter->add_mime_type("image/png");
-                    filter->add_pattern("*.png");
-                    filter->add_mime_type("image/jpeg");
-                    filter->add_pattern("*.jpg");
-
-                    dialog.add_filter(filter);
-
-                    //Show the dialog and wait for a user response:
-                    int result = dialog.run();
-                    if(result == Gtk::RESPONSE_OK) {
-                        std::string filename = dialog.get_filename();
-                        status_label->set_text("Loaded  " + filename);
-                        std::cout << "File selected: " <<  filename << std::endl;                     
-                        
-                        display_label->set_text("Load");
-                        menu_file_load->set_sensitive(false);
-                        menu_file_save->set_sensitive(true);
-                        menu_edit_rotate->set_sensitive(true);                       
-                    }
+                    boost::regex regExInt("^(\\+|-)?\\d+$");
+                    
+                    auto status_height = boost::regex_match(std::string(content_height), regExInt);
+                    auto status_width = boost::regex_match(std::string(content_width), regExInt);
+                    resize_ok_btn->set_sensitive(status_height & status_width);
                 });
-          
-                menu_file_save->signal_activate().connect(
+
+                resize_cancel_btn->signal_clicked().connect(
                 [this]() {
-                    display_label->set_text("Save");
-                    menu_file_load->set_sensitive(true);
-                    menu_file_save->set_sensitive(false);
+                    resize_dialog->hide();
+                    std::cout << " Resize Cancel" << std::endl;
                 });
 
                 add(*cont);
             }
         }
-        set_title("Simple Gtk::Builder demo");
-        set_default_size(400, 400);
         show_all();
     }
 };
+
+void HelloWindow::on_openfile_dialog()
+{
+    Gtk::FileChooserDialog dialog("Please choose a file",
+            Gtk::FILE_CHOOSER_ACTION_OPEN);
+    dialog.set_transient_for(*this);
+
+    //Add response buttons the the dialog:
+    dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
+    dialog.add_button("_Open", Gtk::RESPONSE_OK);
+
+    //Add filters, so that only certain file types can be selected:
+    auto filter = Gtk::FileFilter::create();
+    filter->set_name("PNG and JPEG images");
+    filter->add_mime_type("image/png");
+    filter->add_pattern("*.png");
+    filter->add_mime_type("image/jpeg");
+    filter->add_pattern("*.jpg");
+
+    dialog.add_filter(filter);
+
+    //Show the dialog and wait for a user response:
+    int result = dialog.run();
+    if(result == Gtk::RESPONSE_OK) {
+        std::string filename = dialog.get_filename();
+        status_label->set_text("Loaded  " + filename);
+        std::cout << "File selected: " <<  filename << std::endl;                     
+        
+        display_label->set_text("Load");
+        menu_file_load->set_sensitive(false);
+        menu_file_save->set_sensitive(true);
+        menu_edit_rotate->set_sensitive(true); 
+        menu_edit_resize->set_sensitive(true);                      
+    }
+
+}
+
+void HelloWindow::on_savefile_dialog()
+{
+    display_label->set_text("Save");
+    menu_file_load->set_sensitive(true);
+    menu_file_save->set_sensitive(false);
+}
+
 int main(int argc, char *argv[]) {
     auto app = Gtk::Application::create(
         argc, argv, 
