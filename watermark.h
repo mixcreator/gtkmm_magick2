@@ -3,20 +3,24 @@
 #include <Magick++.h>
 
 namespace Watermark{
+    
+class Watermark
+{
+public:
+    Watermark() = default;
 
-    // to watermark.h
-    class Watermark{
-    public:
-        bool Init(const std::string filename);
-        bool wasLoaded() const{
-            return _wasLoaded;
-        }
+    bool Init(const std::string filename);
 
-        bool Do(Magick::Image& image);
+    bool wasLoaded() const{
+        return _wasLoaded;
+    }
 
-    private:
-        bool _wasLoaded=false;
+    bool Do(Magick::Image& image);
 
-        Magick::Image _image;
-    };
-} // Watermark
+private:
+    bool _wasLoaded=false;
+
+    Magick::Image _image;
+};
+
+} // namespace Watermark

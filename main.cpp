@@ -1,4 +1,5 @@
 #include <gtkmm.h>
+#include <Magick++.h>
 
 #include "main_window.h"
 
@@ -8,6 +9,9 @@ int main(int argc, char *argv[]) {
         argc, argv, 
         "org.gtkmm.example.HelloApp"
     );
+    Magick::InitializeMagick(*argv);
+    
     MainWindow::MainWindow hw;
+
     return app->run(hw);
 }

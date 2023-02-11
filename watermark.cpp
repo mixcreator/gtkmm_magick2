@@ -42,5 +42,5 @@ bool Watermark::Init(const std::string filename){
     return true;
 }
 
-} // Watermark
+} // namespace Watermark
 

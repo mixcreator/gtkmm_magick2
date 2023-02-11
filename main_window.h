@@ -50,8 +50,12 @@ private:
     boost::regex regex_int;
     boost::regex regex_float;
 
-    Watermark::Watermark _watermark;
-    Image::Image _image;
+    // Watermark::Watermark _watermark;
+    std::unique_ptr<Watermark::Watermark> _watermark;
+    // Image::Image _image;
+    std::unique_ptr<Image::Image> _image;
+
+    //double _rotate_degree = 0.0;
 
 private:
     template <typename T>

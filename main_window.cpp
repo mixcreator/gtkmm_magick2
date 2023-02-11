@@ -9,7 +9,10 @@ namespace MainWindow{
 MainWindow::MainWindow()
 : ui{Gtk::Builder::create_from_file("simple_with_dlg.glade")}, 
     regex_int("^(\\+|-)?\\d+$"),
-    regex_float("^(-?)(0|([1-9][0-9]*))(\\.[0-9]+)?$") 
+    regex_float("^(-?)(0|([1-9][0-9]*))(\\.[0-9]+)?$"),
+    _watermark(std::make_unique<Watermark::Watermark>()),
+    _image(std::make_unique<Image::Image>())
+    
 {
     set_title("Simple Gtk::Builder demo");
     set_default_size(400, 400);
@@ -57,13 +60,18 @@ MainWindow::MainWindow()
             [this]() {
                 display_label->set_text("Rotate");
                 rotate_dialog->set_transient_for(*this);
-                rotate_dialog->run();
+                auto buffer = rotate_edit->get_buffer();
+                buffer->set_text("0.0");
+                rotate_dialog->set_title("Rotate");
+                
+                std::cout << "Rotate dlg return: " << rotate_dialog->run() << std::endl;
             });
 
             menu_edit_resize->signal_activate().connect(
             [this]() {
                 display_label->set_text("Resize");
                 resize_dialog->set_transient_for(*this);
+                resize_dialog->set_title("Resize");
                 resize_dialog->run();
             });
 
@@ -82,10 +90,21 @@ MainWindow::MainWindow()
             
             // For Rotate dialog !!!    
             rotate_ok_btn->signal_clicked().connect(
-            [this]() {
+            [this]() 
+            {
                 auto content = rotate_edit->get_buffer()->get_text();
-                display_label->set_text(content);
-                // Magick++ rotate
+                std::string::size_type sz;
+                if(_image->Rotate(std::stod(content, &sz)))
+                {
+                    auto image = _image->getImage();
+                    std::cout << "Rotated: " << content << "\'  " << image.columns() << "x" << image.rows() << std::endl;           
+                    display_label->set_text(content);                    
+                } 
+                else
+                {
+                    std::cout << "Rotate error" << std::endl;
+                }
+
                 rotate_dialog->hide();
             });
 
@@ -107,29 +126,32 @@ MainWindow::MainWindow()
             [this]() {
                 auto content_width = resize_width_edit->get_buffer()->get_text();
                 auto content_height = resize_height_edit->get_buffer()->get_text();
-                display_label->set_text(content_width + "x" + content_height);
-                // Magick++ resize(zoom)
+            
+                if(_image->Resize(content_width + "x" + content_height))
+                {
+                    auto image = _image->getImage();
+                    std::cout << "Resized: " << image.columns() << "x" << image.rows() << std::endl;
+                    display_label->set_text(std::to_string(image.columns()) + "x" +  std::to_string(image.rows()));
+                }
+                else
+                {
+                    std::cout << "Resize error" << std::endl;
+                }                
                 resize_dialog->hide();
             });
 
-            resize_width_edit->get_buffer()->signal_changed().connect(
+            auto resize_edit_slot =
             [this]() {
                 auto content_width = resize_width_edit->get_buffer()->get_text();
                 auto content_height = resize_height_edit->get_buffer()->get_text();
                 auto status_width = boost::regex_match(std::string(content_width), regex_int);
                 auto status_height = boost::regex_match(std::string(content_height), regex_int);
-
                 resize_ok_btn->set_sensitive(status_width & status_height);
-            });
+            };
 
-            resize_height_edit->get_buffer()->signal_changed().connect(
-            [this]() {
-                auto content_height = resize_height_edit->get_buffer()->get_text();
-                auto content_width = resize_width_edit->get_buffer()->get_text();
-                auto status_height = boost::regex_match(std::string(content_height), regex_int);
-                auto status_width = boost::regex_match(std::string(content_width), regex_int);
-                resize_ok_btn->set_sensitive(status_height & status_width);
-            });
+            resize_width_edit->get_buffer()->signal_changed().connect(resize_edit_slot);
+
+            resize_height_edit->get_buffer()->signal_changed().connect(resize_edit_slot);
 
             resize_cancel_btn->signal_clicked().connect(
             [this]() {
@@ -180,10 +202,19 @@ void MainWindow::on_openfile_dialog()
         std::cout << "File selected: " <<  filename << std::endl;                     
         
         display_label->set_text("Load");
-        menu_file_load->set_sensitive(false);
+        menu_file_load->set_sensitive(false); //????
         menu_file_save->set_sensitive(true);
         menu_edit_rotate->set_sensitive(true); 
-        menu_edit_resize->set_sensitive(true);                      
+        menu_edit_resize->set_sensitive(true);
+
+        if(_image->Load(dialog.get_filename()))
+        {
+            auto image = _image->getImage();
+            std::cout << "Read to Image: " << filename << "("<< image.columns() << "x" << image.rows() << ")" <<std::endl;
+        } 
+        else{
+            std::cout << "Read Error: " << filename << std::endl;
+        }
     }
 
 }

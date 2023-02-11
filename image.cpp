@@ -48,7 +48,8 @@ bool Image::Load(const std::string filename){
 
 bool Image::Rotate(const double degree){
 
-    if(!_wasLoaded){
+    if(!_wasLoaded)
+    {
         std::cout << "Image was not loaded !" << std::endl;
         return false;
     }
@@ -69,7 +70,8 @@ bool Image::Rotate(const double degree){
 
 bool Image::Resize(const double zoom_in_factor){
 
-    if(!_wasLoaded){
+    if(!_wasLoaded)
+    {
         std::cout << "Image was not loaded !" << std::endl;
         return false;
     }
@@ -88,6 +90,29 @@ bool Image::Resize(const double zoom_in_factor){
 
     return true;
 
+}
+
+bool Image::Resize(const std::string size)
+{
+    if(!_wasLoaded)
+    {
+        std::cout << "Image was not loaded !" << std::endl;
+        return false;
+    }
+
+    try
+    {
+
+        _image.resize(size);
+        return true;
+    }
+    catch(const std::exception &error_)
+    {
+        std::cout << "Caught exception: " << error_.what() << std::endl;
+        return false;    
+    }
+
+    return true;    
 }
 
 }// Image namespace

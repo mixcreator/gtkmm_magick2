@@ -4,23 +4,27 @@
 
 namespace Image{
 
-  // to image.h
-  class Image{
-  public:
+class Image
+{
+public:
+    Image() = default;
 
-      Magick::Image& getImage();
+    Magick::Image& getImage();
 
-      bool Save(const std::string filename);
+    bool Save(const std::string filename);
 
-      bool Load(const std::string filename);
+    bool Load(const std::string filename);
 
-      bool Rotate(const double degree);
+    bool Rotate(const double degree);
 
-      bool Resize(const double zoom_in_factor);
+    bool Resize(const double zoom_in_factor);
 
-  private:
-      Magick::Image _image;
+    bool Resize(const std::string size);
 
-      bool _wasLoaded = false;
-  };
-}
+private:
+    Magick::Image _image;
+
+    bool _wasLoaded = false;
+};
+
+} // namespace Image
