@@ -5,6 +5,11 @@
 #include <boost/regex.hpp>
 #include <variant>
 
+#include "image.h"
+#include "watermark.h"
+
+namespace MainWindow{
+
 class MainWindow : public Gtk::ApplicationWindow {
 public:
     MainWindow();
@@ -41,8 +46,12 @@ private:
                                Glib::RefPtr<Gtk::ImageMenuItem>, 
                                Glib::RefPtr<Gtk::Label>,  
                                Gtk::Box* > > _widgets;
+    
     boost::regex regex_int;
     boost::regex regex_float;
+
+    Watermark::Watermark _watermark;
+    Image::Image _image;
 
 private:
     template <typename T>
@@ -53,3 +62,5 @@ private:
     void on_openfile_dialog();
     void on_savefile_dialog();
 };
+
+} // namespace MainWindow

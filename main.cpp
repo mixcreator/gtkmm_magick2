@@ -8,6 +8,6 @@ int main(int argc, char *argv[]) {
         argc, argv, 
         "org.gtkmm.example.HelloApp"
     );
-    MainWindow hw;
+    MainWindow::MainWindow hw;
     return app->run(hw);
 }

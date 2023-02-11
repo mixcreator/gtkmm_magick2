@@ -4,6 +4,8 @@
 
 #include "main_window.h"
 
+namespace MainWindow{
+
 MainWindow::MainWindow()
 : ui{Gtk::Builder::create_from_file("simple_with_dlg.glade")}, 
     regex_int("^(\\+|-)?\\d+$"),
@@ -246,5 +248,7 @@ bool MainWindow::check_widgets() const
 
     return res;
 }
+
+} // namespace MainWindow
 
 
