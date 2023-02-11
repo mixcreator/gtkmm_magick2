@@ -98,7 +98,11 @@ MainWindow::MainWindow()
                 {
                     auto image = _image->getImage();
                     std::cout << "Rotated: " << content << "\'  " << image.columns() << "x" << image.rows() << std::endl;           
-                    display_label->set_text(content);                    
+                    display_label->set_text(
+                        content + "\n" + 
+                        std::to_string((int)(image.columns())) + "x" + 
+                        std::to_string((int)(image.rows()))
+                    );                    
                 } 
                 else
                 {
@@ -198,7 +202,7 @@ void MainWindow::on_openfile_dialog()
     int result = dialog.run();
     if(result == Gtk::RESPONSE_OK) {
         std::string filename = dialog.get_filename();
-        status_label->set_text("Loaded  " + filename);
+        
         std::cout << "File selected: " <<  filename << std::endl;                     
         
         display_label->set_text("Load");
@@ -209,11 +213,13 @@ void MainWindow::on_openfile_dialog()
 
         if(_image->Load(dialog.get_filename()))
         {
+            status_label->set_text("Loaded  " + filename);
             auto image = _image->getImage();
             std::cout << "Read to Image: " << filename << "("<< image.columns() << "x" << image.rows() << ")" <<std::endl;
         } 
-        else{
-            std::cout << "Read Error: " << filename << std::endl;
+        else
+        {
+            std::cout << "Load Error: " << filename << std::endl;
         }
     }
 
@@ -221,10 +227,34 @@ void MainWindow::on_openfile_dialog()
 
 void MainWindow::on_savefile_dialog()
 {
-    display_label->set_text("Save");
-    menu_file_load->set_sensitive(true);
-    menu_file_save->set_sensitive(false);
+    Gtk::FileChooserDialog dialog("Please choose a file",
+            Gtk::FILE_CHOOSER_ACTION_SAVE);
+    dialog.set_transient_for(*this);
+
+    dialog.add_button("_Cancel", Gtk::RESPONSE_CANCEL);
+    dialog.add_button("_Save", Gtk::RESPONSE_OK);
+
+
+    int result = dialog.run();
+    if(result == Gtk::RESPONSE_OK)
+    {
+        std::cout << "Save clicked." << std::endl;
+
+        std::string filename = dialog.get_filename();
+        std::cout << "File selected: " <<  filename << std::endl;  
+        
+        if(_image->Save( dialog.get_filename()))
+        {
+            status_label->set_text("Saved  " + filename);
+        }
+        else        
+        {
+            std::cout << "Save Error: " << filename << std::endl;
+        }
+    }
+    
 }
+
 
 bool MainWindow::check_widgets() const
 {
