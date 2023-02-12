@@ -32,6 +32,7 @@ MainWindow::MainWindow()
 
         menu_edit_rotate = add_widget<Gtk::MenuItem>("id_menu_edit_rotate");
         menu_edit_resize = add_widget<Gtk:: MenuItem>("id_menu_edit_resize");
+        menu_edit_watermark = add_widget<Gtk:: MenuItem>("id_menu_edit_watermark");
         
 
         // --------------- Rotate Dialog ---------------------------------
@@ -88,7 +89,20 @@ MainWindow::MainWindow()
             menu_file_save->signal_activate().connect(
                 sigc::mem_fun(*this, &MainWindow::on_savefile_dialog));
 
-            
+            menu_edit_watermark->signal_activate().connect(
+            [this]() 
+            {
+                std::cout << "Doing watermark" << std::endl;
+                if(_watermark->Do(_image->getImage())){
+                    display_label->set_text("Watermark");
+                    std::cout << "Done" << std::endl;
+                } else{
+                    std::cout << "Watermark error" << std::endl;
+                }
+
+            });
+
+
             // For Rotate dialog !!!    
             rotate_ok_btn->signal_clicked().connect(
             [this]() 
@@ -163,6 +177,10 @@ MainWindow::MainWindow()
                 resize_dialog->hide();
             });
 
+            if(!_watermark->Load("wmark_image.png")){
+                std::cout << "Watermark image was not loaded !" << std::endl;
+            }
+
             add(*cont);
         }
     }
@@ -207,10 +225,11 @@ void MainWindow::on_openfile_dialog()
         std::cout << "File selected: " <<  filename << std::endl;                     
         
         display_label->set_text("Load");
-        menu_file_load->set_sensitive(false); //????
+        //menu_file_load->set_sensitive(false); //????
         menu_file_save->set_sensitive(true);
         menu_edit_rotate->set_sensitive(true); 
         menu_edit_resize->set_sensitive(true);
+        menu_edit_watermark->set_sensitive(true);
 
         if(_image->Load(dialog.get_filename()))
         {

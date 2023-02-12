@@ -83,6 +83,7 @@
                 <child>
                   <object class="GtkMenuItem" id="id_menu_edit_rotate">
                     <property name="visible">True</property>
+                    <property name="sensitive">False</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">Rotate</property>
                     <property name="use_underline">True</property>
@@ -91,8 +92,18 @@
                 <child>
                   <object class="GtkMenuItem" id="id_menu_edit_resize">
                     <property name="visible">True</property>
+                    <property name="sensitive">False</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">Resize</property>
+                    <property name="use_underline">True</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkMenuItem" id="id_menu_edit_watermark">
+                    <property name="visible">True</property>
+                    <property name="sensitive">False</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Watermark</property>
                     <property name="use_underline">True</property>
                   </object>
                 </child>

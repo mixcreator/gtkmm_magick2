@@ -28,6 +28,7 @@ private:
     
     Glib::RefPtr<Gtk::MenuItem> menu_edit_rotate;
     Glib::RefPtr<Gtk::MenuItem> menu_edit_resize;
+    Glib::RefPtr<Gtk::MenuItem> menu_edit_watermark;
     
     Glib::RefPtr<Gtk::Dialog> rotate_dialog;
     Glib::RefPtr<Gtk::Button> rotate_ok_btn;

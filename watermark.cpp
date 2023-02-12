@@ -28,7 +28,7 @@ bool Watermark::Do(Magick::Image& image){
     return true;          
 }
 
-bool Watermark::Init(const std::string filename){
+bool Watermark::Load(const std::string filename){
     try{
         _image.read(filename);
         _wasLoaded = true;

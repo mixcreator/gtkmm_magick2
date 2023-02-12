@@ -9,7 +9,7 @@ class Watermark
 public:
     Watermark() = default;
 
-    bool Init(const std::string filename);
+    bool Load(const std::string filename);
 
     bool wasLoaded() const{
         return _wasLoaded;
