@@ -26,8 +26,8 @@ private:
     Glib::RefPtr<Gtk::ImageMenuItem> menu_file_save;
     Glib::RefPtr<Gtk::ImageMenuItem> menu_file_quit;
     
-    Glib::RefPtr<Gtk::ImageMenuItem> menu_edit_rotate;
-    Glib::RefPtr<Gtk::ImageMenuItem> menu_edit_resize;
+    Glib::RefPtr<Gtk::MenuItem> menu_edit_rotate;
+    Glib::RefPtr<Gtk::MenuItem> menu_edit_resize;
     
     Glib::RefPtr<Gtk::Dialog> rotate_dialog;
     Glib::RefPtr<Gtk::Button> rotate_ok_btn;
@@ -43,7 +43,8 @@ private:
     std::vector< std::variant< Glib::RefPtr<Gtk::Dialog>, 
                                Glib::RefPtr<Gtk::Button>, 
                                Glib::RefPtr<Gtk::TextView>, 
-                               Glib::RefPtr<Gtk::ImageMenuItem>, 
+                               Glib::RefPtr<Gtk::ImageMenuItem>,
+                               Glib::RefPtr<Gtk::MenuItem>,
                                Glib::RefPtr<Gtk::Label>,  
                                Gtk::Box* > > _widgets;
     

@@ -81,41 +81,19 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkImageMenuItem" id="id_menu_edit_rotate">
-                    <property name="label">gtk-cut</property>
+                  <object class="GtkMenuItem" id="id_menu_edit_rotate">
                     <property name="visible">True</property>
-                    <property name="sensitive">False</property>
                     <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Rotate</property>
                     <property name="use_underline">True</property>
-                    <property name="use_stock">True</property>
                   </object>
                 </child>
                 <child>
-                  <object class="GtkImageMenuItem" id="id_menu_edit_resize">
-                    <property name="label">gtk-copy</property>
-                    <property name="visible">True</property>
-                    <property name="sensitive">False</property>
-                    <property name="can_focus">False</property>
-                    <property name="use_underline">True</property>
-                    <property name="use_stock">True</property>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkImageMenuItem">
-                    <property name="label">gtk-paste</property>
+                  <object class="GtkMenuItem" id="id_menu_edit_resize">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Resize</property>
                     <property name="use_underline">True</property>
-                    <property name="use_stock">True</property>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkImageMenuItem">
-                    <property name="label">gtk-delete</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="use_underline">True</property>
-                    <property name="use_stock">True</property>
                   </object>
                 </child>
               </object>

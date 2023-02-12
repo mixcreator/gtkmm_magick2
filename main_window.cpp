@@ -29,8 +29,9 @@ MainWindow::MainWindow()
         menu_file_quit = add_widget<Gtk::ImageMenuItem>("id_menu_file_exit");            
         menu_file_load = add_widget<Gtk::ImageMenuItem>("id_menu_file_load");
         menu_file_save = add_widget<Gtk::ImageMenuItem>("id_menu_file_save");            
-        menu_edit_rotate = add_widget<Gtk::ImageMenuItem>("id_menu_edit_rotate");
-        menu_edit_resize = add_widget<Gtk::ImageMenuItem>("id_menu_edit_resize");
+
+        menu_edit_rotate = add_widget<Gtk::MenuItem>("id_menu_edit_rotate");
+        menu_edit_resize = add_widget<Gtk:: MenuItem>("id_menu_edit_resize");
         
 
         // --------------- Rotate Dialog ---------------------------------
