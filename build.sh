@@ -1,5 +1,6 @@
 #!/bin/sh
 
+
 rm ./gtk+_app
 
 g++ main.cpp \
